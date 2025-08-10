@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EKSU BRO - CGPA Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .calculator-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            animation: slideInLeft 1s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calculator-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .calculator-section:hover::before {
+            left: 100%;
+        }
+
+        .info-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            animation: slideInRight 1s ease-out;
+        }
+
+        .section-title {
+            color: #764ba2;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .course-input {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+            align-items: center;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .course-input:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .course-input input, .course-input select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .course-input input:focus, .course-input select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .add-course-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .add-course-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .calculate-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(17, 153, 142, 0.4);
+        }
+
+        .grading-info {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .grading-info h3 {
+            color: #764ba2;
+            margin: 15px 0 10px 0;
+        }
+
+        .whatsapp-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+            transition: all 0.3s ease;
+            animation: bounce 2s infinite;
+            z-index: 1000;
+        }
+
+        .whatsapp-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 25px rgba(37, 211, 102, 0.6);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            min-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: scaleIn 0.3s ease;
+        }
+
+        .modal-content h2 {
+            color: #764ba2;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .cgpa-result {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #11998e;
+            margin: 20px 0;
+        }
+
+        .classification {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        .close-modal {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .share-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .services-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            color: white;
+        }
+
+        .services-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .service-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .service-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .service-desc {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .contact-services {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .contact-services:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .modal-content {
+                min-width: 90%;
+                padding: 30px 20px;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .services-section {
+                margin-top: 20px;
+                padding: 20px;
+            }
+            
+            .course-input {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 EKSU BRO</h1>
+            <p>Professional CGPA Calculator - Your Academic Success Partner</p>
+        </div>
+
+        <div class="main-content">
+            <div class="calculator-section">
+                <h2 class="section-title">📊 CGPA Calculator</h2>
+                
+                <div id="coursesContainer">
+                    <div class="course-input">
+                        <input type="text" placeholder="Course Title (e.g. Mathematics)" class="course-title">
+                        <input type="number" placeholder="Credit Units" min="1" max="6" class="credit-units">
+                        <select class="grade">
+                            <option value="">Select Grade</option>
+                            <option value="5">A (70-100)</option>
+                            <option value="4">B (60-69)</option>
+                            <option value="3">C (50-59)</option>
+                            <option value="2">D (45-49)</option>
+                            <option value="1">E (40-44)</option>
+                            <option value="0">F (0-39)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="add-course-btn" onclick="addCourse()">➕ Add Another Course</button>
+                <button class="calculate-btn" onclick="calculateCGPA()">🚀 Calculate My CGPA</button>
+            </div>
+
+            <div class="info-section">
+                <h2 class="section-title">📖 Grading Information</h2>
+                <div class="grading-info">
+                    <h3>🎯 EKSU Grading System (5.00 Scale)</h3>
+                    <p><strong>Grade Points:</strong><br>
+                    A = 5 (70-100)<br>
+                    B = 4 (60-69)<br>
+                    C = 3 (50-59)<br>
+                    D = 2 (45-49)<br>
+                    E = 1 (40-44)<br>
+                    F = 0 (0-39)</p>
+
+                    <h3>🏆 CGPA Classification</h3>
+                    <p><strong>First Class:</strong> 4.50 - 5.00<br>
+                    <strong>Second Class Upper:</strong> 3.50 - 4.49<br>
+                    <strong>Second Class Lower:</strong> 2.40 - 3.49<br>
+                    <strong>Third Class:</strong> 1.50 - 2.39<br>
+                    <strong>Pass:</strong> 1.00 - 1.49</p>
+
+                    <h3>💡 How CGPA is Calculated</h3>
+                    <p>CGPA = Total Grade Points (TGP) ÷ Total Credit Units (TCU)</p>
+                    
+                    <p style="margin-top: 15px; font-style: italic; color: #667eea;">
+                    "Success is not final, failure is not fatal: it is the courage to continue that counts." - Keep grinding! 💪
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Button -->
+    <button class="whatsapp-btn" onclick="openWhatsApp()" title="Join EKSU BRO WhatsApp">
+        📱
+    </button>
+
+    <!-- Modal -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <h2>🎉 Your CGPA Result</h2>
+            <div class="cgpa-result" id="cgpaValue">0.00</div>
+            <div class="classification" id="classification">Classification</div>
+            <p id="motivationText"></p>
+            <div style="margin-top: 30px;">
+                <button class="close-modal" onclick="closeModal()">Close</button>
+                <button class="share-btn" onclick="shareResult()">Share on WhatsApp</button>
+            </div>
+
+            <!-- Services Section -->
+            <div class="services-section">
+                <div class="services-title">🌟 EKSU BRO Premium Services</div>
+                <div class="services-grid">
+                    <div class="service-card" onclick="contactForService('matchmaking')">
+                        <span class="service-icon">💕</span>
+                        <div class="service-title">Match Making</div>
+                        <div class="service-desc">Find your perfect campus partner</div>
+                    </div>
+                    <div class="service-card" onclick="contactForService('crypto')">
+                        <span class="service-icon">₿</span>
+                        <div class="service-title">Crypto Trading</div>
+                        <div class="service-desc">Learn cryptocurrency & trading</div>
+                    </div>
+                    <div class="service-card" onclick="contactForService('laundry')">
+                        <span class="service-icon">👕</span>
+                        <div class="service-title">Laundry Services</div>
+                        <div class="service-desc">Professional clothing care</div>
+                    </div>
+                </div>
+                <button class="contact-services" onclick="contactForService('all')">
+                    📞 Contact for All Services
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let courseCount = 1;
+
+        function addCourse() {
+            const container = document.getElementById('coursesContainer');
+            const newCourse = document.createElement('div');
+            newCourse.className = 'course-input';
+            newCourse.innerHTML = `
+                <input type="text" placeholder="Course Title" class="course-title">
+                <input type="number" placeholder="Credit Units" min="1" max="6" class="credit-units">
+                <select class="grade">
+                    <option value="">Select Grade</option>
+                    <option value="5">A (70-100)</option>
+                    <option value="4">B (60-69)</option>
+                    <option value="3">C (50-59)</option>
+                    <option value="2">D (45-49)</option>
+                    <option value="1">E (40-44)</option>
+                    <option value="0">F (0-39)</option>
+                </select>
+            `;
+            container.appendChild(newCourse);
+            courseCount++;
+            
+            // Animate the new course input
+            newCourse.style.opacity = '0';
+            newCourse.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                newCourse.style.transition = 'all 0.3s ease';
+                newCourse.style.opacity = '1';
+                newCourse.style.transform = 'translateY(0)';
+            }, 50);
+        }
+
+        function calculateCGPA() {
+            const courses = document.querySelectorAll('.course-input');
+            let totalGradePoints = 0;
+            let totalCreditUnits = 0;
+            let validCourses = 0;
+
+            courses.forEach(course => {
+                const creditUnits = parseFloat(course.querySelector('.credit-units').value);
+                const grade = parseFloat(course.querySelector('.grade').value);
+                const title = course.querySelector('.course-title').value.trim();
+
+                if (creditUnits && !isNaN(grade) && title) {
+                    totalGradePoints += (grade * creditUnits);
+                    totalCreditUnits += creditUnits;
+                    validCourses++;
+                }
+            });
+
+            if (validCourses === 0) {
+                alert('⚠️ Please fill in at least one complete course with title, credit units, and grade!');
+                return;
+            }
+
+            const cgpa = totalGradePoints / totalCreditUnits;
+            const roundedCGPA = Math.round(cgpa * 100) / 100;
+
+            showResult(roundedCGPA);
+        }
+
+        function showResult(cgpa) {
+            const modal = document.getElementById('resultModal');
+            const cgpaValue = document.getElementById('cgpaValue');
+            const classification = document.getElementById('classification');
+            const motivationText = document.getElementById('motivationText');
+
+            cgpaValue.textContent = cgpa.toFixed(2);
+
+            let classResult = '';
+            let motivation = '';
+
+            if (cgpa >= 4.50) {
+                classResult = '🏆 First Class';
+                motivation = 'Outstanding! You\'re a true academic champion! 🌟';
+            } else if (cgpa >= 3.50) {
+                classResult = '🥈 Second Class Upper';
+                motivation = 'Excellent work! You\'re doing great! 💪';
+            } else if (cgpa >= 2.40) {
+                classResult = '🥉 Second Class Lower';
+                motivation = 'Good job! Keep pushing for greater heights! 📈';
+            } else if (cgpa >= 1.50) {
+                classResult = '📜 Third Class';
+                motivation = 'You made it! Now aim higher next time! 🎯';
+            } else if (cgpa >= 1.00) {
+                classResult = '✅ Pass';
+                motivation = 'Congratulations on passing! Time to level up! 🚀';
+            } else {
+                classResult = '❌ Fail';
+                motivation = 'Don\'t give up! Every setback is a comeback setup! 💪';
+            }
+
+            classification.textContent = classResult;
+            motivationText.textContent = motivation;
+
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').style.display = 'none';
+        }
+
+        function shareResult() {
+            const cgpa = document.getElementById('cgpaValue').textContent;
+            const classification = document.getElementById('classification').textContent;
+            const message = `🎓 My CGPA Result from EKSU BRO Calculator:\n\nCGPA: ${cgpa}\nClassification: ${classification}\n\n💪 Calculated with EKSU BRO - Your Academic Success Partner!\n\nGet your CGPA calculated too: [Your Website URL]`;
+            
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function openWhatsApp() {
+            const message = "Hello EKSU BRO! 👋 I'm interested in joining the academic community for past questions and updates. Please add me to the group! 📚";
+            const phoneNumber = "2348147356424"; // Add the EKSU BRO WhatsApp number here
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function contactForService(serviceType) {
+            let message = "";
+            const phoneNumber = "2348147356424"; // Add the EKSU BRO WhatsApp number here
+            
+            switch(serviceType) {
+                case 'matchmaking':
+                    message = "Hello EKSU BRO! 💕 I'm interested in your Match Making services. Please tell me more about how it works and pricing. Thanks!";
+                    break;
+                case 'crypto':
+                    message = "Hello EKSU BRO! ₿ I want to learn about cryptocurrency and trading. Can you share details about your crypto teaching services?";
+                    break;
+                case 'laundry':
+                    message = "Hello EKSU BRO! 👕 I need professional laundry services. What are your rates and pickup/delivery options?";
+                    break;
+                case 'all':
+                    message = "Hello EKSU BRO! 🌟 I'm interested in learning more about all your premium services (Match Making, Crypto Teaching, and Laundry Services). Please share more details!";
+                    break;
+                default:
+                    message = "Hello EKSU BRO! I'm interested in your services. Please tell me more!";
+            }
+            
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('resultModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Add some interactivity on page load
+        window.addEventListener('load', function() {
+            // Add a welcome message
+            setTimeout(() => {
+                console.log('🎓 Welcome to EKSU BRO CGPA Calculator!');
+            }, 1000);
+        });
+    </script>
+    <footer style="text-align: center; padding: 40px 20px; color: white; background: rgba(0,0,0,0.1); margin-top: 50px; border-radius: 15px;">
+    <p style="font-size: 1rem; margin-bottom: 15px;">
+        🎨 Developed with ❤️ by <strong>Oluwafemi</strong>
+    </p>
+    <a href="https://wa.me/8109972243?text=Hello!%20I%20love%20the%20EKSU%20Aggregate%20Calculator%20design!" 
+       style="display: inline-block; background: #25D366; color: white; padding: 12px 25px; text-decoration: none; border-radius: 25px; font-weight: bold; transition: all 0.3s ease; margin: 10px;" 
+       target="_blank">
+        📱 Chat with Developer on WhatsApp
+    </a>
+    <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 20px;">
+        © 2025 EKSU BRO - Helping Students Achieve Their Dreams
+    </p>
+</footer>
+</body>
+</html>
